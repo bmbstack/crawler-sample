@@ -1,27 +1,26 @@
 package main
 
 import (
-	"log"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
-	"sync/atomic"
-	"github.com/levigross/grequests"
-	"math/rand"
 	"fmt"
+	"github.com/levigross/grequests"
+	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	. "github.com/onestack/cron-room/helper"
-	"go.uber.org/zap"
+	"log"
+	"math/rand"
+	"os"
+	"os/signal"
 	"runtime"
+	"sync"
+	"sync/atomic"
+	"syscall"
+	"time"
 )
 
 var (
 	urlsCrawled uint64
 
-	crawlLimit    	  uint64 = 1
+	crawlLimit        uint64 = 1
 	numThreads        uint64 = 100
 	crawlDelaySeconds uint64 = 0
 
@@ -135,7 +134,7 @@ func CreateRequestEntity(tag string, requestURL string, params map[string]string
 		URL: requestURL,
 		RequestOptions: &grequests.RequestOptions{
 			UserAgent: getUserAgent(),
-			Params: params,
+			Params:    params,
 		},
 	}
 }
@@ -143,7 +142,7 @@ func CreateRequestEntity(tag string, requestURL string, params map[string]string
 func CreateResponseEntity(tag string, resp *grequests.Response) *ResponseEntity {
 	writeInfo("ResponseEntry", fmt.Sprintf("Tag: %s, Resp: %v", tag, resp.String()))
 	return &ResponseEntity{
-		Tag: tag,
+		Tag:  tag,
 		Resp: resp,
 	}
 }
@@ -168,10 +167,10 @@ func CreateLogger(name string) *zap.Logger {
 
 func writeInfo(msg string, data string) {
 	logger.Info(msg,
-		zap.String(LogKeySource, "[爬虫]"),
-		zap.String(LogKeyTime, time.Now().Format(DateFullLayout)),
-		zap.String(LogKeyData, data),
-		zap.Int(LogKeyGoroutineNum, runtime.NumGoroutine()),
+		zap.String("source", "[爬虫]"),
+		zap.String("date", time.Now().Format("2006-01-02 03:04:05")),
+		zap.String("data", data),
+		zap.Int("goroutineNum", runtime.NumGoroutine()),
 	)
 }
 
@@ -182,24 +181,24 @@ func main() {
 	tag := "hizhu_houselist"
 	requestURL := "http://m.hizhu.com/Home/House/houselist.html"
 	params := map[string]string{
-		"city_code": "001001",
-		"pageno":    "1",
-		"limit":     "1000",
-		"sort":      "-1",
-		"region_id": "",
-		"plate_id": "",
-		"money_max": "999999",
-		"money_min": "0",
-		"logicSort": "0",
-		"line_id": "0",
-		"stand_id": "0",
-		"key": "0",
-		"key_self": "0",
-		"type_no": "0",
-		"search_id": "0",
-		"latitude": "0",
-		"longitude": "0",
-		"distance": "0",
+		"city_code":   "001001",
+		"pageno":      "1",
+		"limit":       "1000",
+		"sort":        "-1",
+		"region_id":   "",
+		"plate_id":    "",
+		"money_max":   "999999",
+		"money_min":   "0",
+		"logicSort":   "0",
+		"line_id":     "0",
+		"stand_id":    "0",
+		"key":         "0",
+		"key_self":    "0",
+		"type_no":     "0",
+		"search_id":   "0",
+		"latitude":    "0",
+		"longitude":   "0",
+		"distance":    "0",
 		"update_time": "0",
 	}
 	requestQueue <- CreateRequestEntity(tag, requestURL, params)
